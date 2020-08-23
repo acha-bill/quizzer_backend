@@ -6,7 +6,6 @@ import (
 	"github.com/acha-bill/quizzer_backend/packages/server"
 	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
-	"os"
 )
 
 
@@ -47,8 +46,6 @@ fmt.Println("1")
 		log.Fatal(err.Error())
 		return
 	}
-
-	log.Info(os.Getenv("MONGODB_URL"))
 
 	_, err = mongodb.Connect()
 	if err != nil {

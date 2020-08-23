@@ -5,9 +5,9 @@ import (
 	"github.com/acha-bill/quizzer_backend/common"
 	"github.com/acha-bill/quizzer_backend/plugins"
 	"github.com/acha-bill/quizzer_backend/plugins/auth"
+	"github.com/acha-bill/quizzer_backend/plugins/question"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/labstack/gommon/log"
 	"net/http"
 	"os"
 	"strconv"
@@ -24,6 +24,7 @@ var (
 var (
 	Plugins = []plugins.Plugin {
 		auth.Plugin(),
+		question.Plugin(),
 	}
 )
 
@@ -62,10 +63,8 @@ func instance() *echo.Echo {
 		fmt.Println(plugin)
 		for _, handler := range plugin.Handlers() {
 			path := plugin.Name() + handler.Path
-			log.Info(path)
 			e.Add(handler.Method, path , handler.Handler,middleware.JWTWithConfig(middleware.JWTConfig{
 				Skipper: func(ctx echo.Context) bool {
-					log.Info(ctx.Path())
 					return strings.HasPrefix(ctx.Path(), "/auth")
 				},
 				Claims:     &common.JWTCustomClaims{},
@@ -73,8 +72,6 @@ func instance() *echo.Echo {
 			}))
 		}
 	}
-
-	log.Info(e.Routes())
 
 	return e
 }

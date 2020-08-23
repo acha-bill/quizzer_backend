@@ -2,7 +2,6 @@ package mongodb
 
 import (
 	"context"
-	"github.com/labstack/gommon/log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
@@ -37,8 +36,6 @@ func connect() (c *mongo.Client, err error) {
 	var ctx = context.TODO()
 	mongoURL := os.Getenv("MONGODB_URL")
 	dbName = os.Getenv("DATABASE_NAME")
-
-	log.Info(mongoURL)
 
 	clientOptions := options.Client().ApplyURI(mongoURL)
 	c, err = mongo.Connect(ctx, clientOptions)
