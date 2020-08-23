@@ -2,6 +2,7 @@ package question
 
 
 import (
+	"github.com/acha-bill/quizzer_backend/common"
 	"github.com/acha-bill/quizzer_backend/models"
 	questionService "github.com/acha-bill/quizzer_backend/packages/dblayer/question"
 	"github.com/acha-bill/quizzer_backend/plugins"
@@ -69,6 +70,11 @@ func init() {
 // @Tags Question
 // @Success 201 {object} FindQuestionsResponse
 func find(ctx echo.Context) error {
+	if !common.IsAdmin(ctx){
+		return ctx.JSON(http.StatusUnauthorized, FindQuestionsResponse{
+			Error: "Unauthorized",
+		})
+	}
 	qs,err := questionService.FindAll()
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, FindQuestionsResponse{
@@ -88,6 +94,11 @@ func find(ctx echo.Context) error {
 // @Param question body CreateQuestionRequest true "create"
 // @Success 201 {object} CreateQuestionResponse
 func create(ctx echo.Context) error {
+	if !common.IsAdmin(ctx){
+		return ctx.JSON(http.StatusUnauthorized, CreateQuestionErrorResponse{
+			Error: "Unauthorized",
+		})
+	}
 	var req CreateQuestionRequest
 	if err := ctx.Bind(&req); err != nil {
 		return ctx.JSON(http.StatusBadRequest, CreateQuestionErrorResponse{
