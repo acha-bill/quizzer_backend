@@ -2,33 +2,47 @@ package main
 
 import (
 	"github.com/acha-bill/quizzer_backend/plugins"
+	"context"
+	"net/http"
+	"os"
+
 	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
-	"net/http"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-// @title Swagger Example API
-// @version 1.0
-// @description This is a sample server celler server.
-// @termsOfService http://swagger.io/terms/
+var collection *mongo.Collection
+var ctx = context.TODO()
 
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-func main() {
+func init() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
+	mongoURL := os.Getenv("MONGODB_URL")
+	dbName := os.Getenv("DATABASE_NAME")
+
+	clientOptions := options.Client().ApplyURI(mongoURL)
+	client, err := mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	collection = client.Database(dbName).Collection("testCollection")
+}
+
+func main() {
 	// Echo instance
 	e := echo.New()
 

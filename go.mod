@@ -16,4 +16,5 @@ require (
 	golang.org/x/net v0.0.0-20200822124328-c89045814202 // indirect
 	golang.org/x/tools v0.0.0-20200822203824-307de81be3f4 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
+	go.mongodb.org/mongo-driver v1.4.0
 )
