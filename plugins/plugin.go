@@ -1,7 +1,6 @@
 package plugins
 
 import (
-	"github.com/acha-bill/quizzer_backend/plugins/auth"
 	"github.com/labstack/echo/v4"
 )
 
@@ -14,11 +13,5 @@ type PluginHandler struct {
 type Plugin interface {
 	Name() string
 	AddHandler(method string, path string, handler func(echo.Context) error)
-	Handlers() []PluginHandler
+	Handlers() []*PluginHandler
 }
-
-var (
-	Plugins = []Plugin {
-		auth.Plugin(),
-	}
-)

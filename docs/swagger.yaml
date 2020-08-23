@@ -1,8 +1,57 @@
+basePath: /api/v1
 definitions:
+  auth.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  auth.LoginResponse:
+    properties:
+      error:
+        type: string
+      token:
+        type: string
+    type: object
+  auth.RegisterRequest:
+    properties:
+      isAdmin:
+        type: boolean
+      password:
+        type: string
+      profileURL:
+        type: string
+      username:
+        type: string
+    type: object
+  auth.RegisterResponse:
+    $ref: '#/definitions/models.User'
+  models.Question:
+    properties:
+      answers:
+        items:
+          type: string
+        type: array
+      correctAnswer:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      question:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   models.User:
     properties:
       createdAt:
         type: string
+      id:
+        type: string
+      isAdmin:
+        type: boolean
       password:
         type: string
       profileURL:
@@ -12,41 +61,123 @@ definitions:
       username:
         type: string
     type: object
+  question.CreateQuestionRequest:
+    properties:
+      answers:
+        items:
+          type: string
+        type: array
+      correctAnswer:
+        type: string
+      question:
+        type: string
+    type: object
+  question.CreateQuestionResponse:
+    $ref: '#/definitions/models.Question'
+  question.FindQuestionsResponse:
+    properties:
+      error:
+        type: string
+      questions:
+        items:
+          $ref: '#/definitions/models.Question'
+        type: array
+    type: object
+host: localhost:8080
 info:
   contact:
     email: support@swagger.io
-    name: API Support
+    name: Acha Bill
     url: http://www.swagger.io/support
-  description: This is a sample server celler server.
+  description: API for quizzer
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
+  title: Quizzer API
   version: "1.0"
 paths:
-  /accounts/{id}:
-    get:
+  /auth/login:
+    post:
       consumes:
       - application/json
-      description: get string by ID
-      operationId: get-string-by-int
       parameters:
-      - description: Account ID
-        in: path
-        name: id
+      - description: login
+        in: body
+        name: login
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
-          headers:
-            Token:
-              description: qwerty
-              type: string
           schema:
-            $ref: '#/definitions/models.User'
-      summary: Show a account
+            $ref: '#/definitions/auth.LoginResponse'
+      summary: Login user
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: register
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/auth.RegisterResponse'
+      summary: register user
+      tags:
+      - Auth
+  /question/:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/question.FindQuestionsResponse'
+      summary: list all questions
+      tags:
+      - Question
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: create
+        in: body
+        name: question
+        required: true
+        schema:
+          $ref: '#/definitions/question.CreateQuestionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/question.CreateQuestionResponse'
+      summary: create question
+      tags:
+      - Question
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  BasicAuth:
+    type: basic
 swagger: "2.0"
