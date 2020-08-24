@@ -29,11 +29,15 @@ type Search struct {
 }
 
 // AddHandler Method definition from interface
-func (plugin *Search) AddHandler(method string, path string, handler func(echo.Context) error) {
+func (plugin *Search) AddHandler(method string, path string, handler func(echo.Context) error, authLevel ...plugins.AuthLevel) {
 	pluginHandler := &plugins.PluginHandler{
-		Path:    path,
-		Handler: handler,
-		Method:  method,
+		Path:      path,
+		Handler:   handler,
+		Method:    method,
+		AuthLevel: plugins.AuthLevelUser,
+	}
+	if len(authLevel) > 0 {
+		pluginHandler.AuthLevel = authLevel[0]
 	}
 	plugin.handlers = append(plugin.handlers, pluginHandler)
 }
@@ -82,15 +86,17 @@ func findOpponent(ctx echo.Context) error {
 	users, err := userService.Find(filter)
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, ErrorResponse{
-			Error: "User doesn't exist!",
-		})
-	}
-	// Put user in search mode
-	if err := ctx.Bind(users); err != nil {
-		return ctx.JSON(http.StatusServiceUnavailable, ErrorResponse{
 			Error: err.Error(),
 		})
 	}
+
+	if len(users) == 0 {
+		return ctx.JSON(http.StatusNotFound, ErrorResponse{
+			Error: "User doesn't exist!",
+		})
+	}
+
+	// Put user in search mode
 	users[0].IsSearching = true
 	userService.UpdateByID(ctx.Param("userId"), *(users[0]))
 	// Get other users in search mode

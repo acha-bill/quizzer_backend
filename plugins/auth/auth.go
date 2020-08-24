@@ -34,11 +34,15 @@ type Auth struct {
 }
 
 // AddHandler Method definition from interface
-func (plugin *Auth) AddHandler(method string, path string, handler func(echo.Context) error) {
+func (plugin *Auth) AddHandler(method string, path string, handler func(echo.Context) error, authLevel ...plugins.AuthLevel) {
 	pluginHandler := &plugins.PluginHandler{
-		Path:    path,
-		Handler: handler,
-		Method:  method,
+		Path:      path,
+		Handler:   handler,
+		Method:    method,
+		AuthLevel: plugins.AuthLevelUser,
+	}
+	if len(authLevel) > 0 {
+		pluginHandler.AuthLevel = authLevel[0]
 	}
 	plugin.handlers = append(plugin.handlers, pluginHandler)
 }
@@ -71,8 +75,8 @@ func Plugin() *Auth {
 
 func init() {
 	auth := Plugin()
-	auth.AddHandler(http.MethodPost, "/login", login)
-	auth.AddHandler(http.MethodPost, "/register", register)
+	auth.AddHandler(http.MethodPost, "/login", login, plugins.AuthLevelNone)
+	auth.AddHandler(http.MethodPost, "/register", register, plugins.AuthLevelNone)
 }
 
 ///// handlers

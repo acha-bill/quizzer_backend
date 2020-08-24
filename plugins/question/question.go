@@ -1,36 +1,41 @@
 package question
 
-
 import (
+	"net/http"
+	"sync"
+	"time"
+
 	"github.com/acha-bill/quizzer_backend/common"
 	"github.com/acha-bill/quizzer_backend/models"
 	questionService "github.com/acha-bill/quizzer_backend/packages/dblayer/question"
 	"github.com/acha-bill/quizzer_backend/plugins"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
-	"sync"
-	"time"
 )
 
 const (
 	PluginName = "question"
 )
+
 var (
 	plugin *Question
-	once sync.Once
+	once   sync.Once
 )
 
 type Question struct {
-	name string
+	name     string
 	handlers []*plugins.PluginHandler
 }
 
-func (plugin *Question) AddHandler(method string, path string, handler func(echo.Context) error) {
+func (plugin *Question) AddHandler(method string, path string, handler func(echo.Context) error, authLevel ...plugins.AuthLevel) {
 	pluginHandler := &plugins.PluginHandler{
-		Path:    path,
-		Handler: handler,
-		Method: method,
+		Path:      path,
+		Handler:   handler,
+		Method:    method,
+		AuthLevel: plugins.AuthLevelUser,
+	}
+	if len(authLevel) > 0 {
+		pluginHandler.AuthLevel = authLevel[0]
 	}
 	plugin.handlers = append(plugin.handlers, pluginHandler)
 }
@@ -70,12 +75,12 @@ func init() {
 // @Tags Question
 // @Success 201 {object} FindQuestionsResponse
 func find(ctx echo.Context) error {
-	if !common.IsAdmin(ctx){
+	if !common.IsAdmin(ctx) {
 		return ctx.JSON(http.StatusUnauthorized, FindQuestionsResponse{
 			Error: "Unauthorized",
 		})
 	}
-	qs,err := questionService.FindAll()
+	qs, err := questionService.FindAll()
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, FindQuestionsResponse{
 			Error: err.Error(),
@@ -94,7 +99,7 @@ func find(ctx echo.Context) error {
 // @Param question body CreateQuestionRequest true "create"
 // @Success 201 {object} CreateQuestionResponse
 func create(ctx echo.Context) error {
-	if !common.IsAdmin(ctx){
+	if !common.IsAdmin(ctx) {
 		return ctx.JSON(http.StatusUnauthorized, CreateQuestionErrorResponse{
 			Error: "Unauthorized",
 		})
@@ -111,8 +116,8 @@ func create(ctx echo.Context) error {
 		Question:      req.Question,
 		Answers:       req.Answers,
 		CorrectAnswer: req.CorrectAnswer,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	created, err := questionService.Create(q)
@@ -126,9 +131,9 @@ func create(ctx echo.Context) error {
 }
 
 type CreateQuestionRequest struct {
-	Question string `json:"question"`
-	Answers []string `json:"answers"`
-	CorrectAnswer string `json:"correctAnswer"`
+	Question      string   `json:"question"`
+	Answers       []string `json:"answers"`
+	CorrectAnswer string   `json:"correctAnswer"`
 }
 
 type CreateQuestionResponse models.Question
@@ -137,6 +142,6 @@ type CreateQuestionErrorResponse struct {
 }
 
 type FindQuestionsResponse struct {
-	Error string `json:"error,omitempty"`
+	Error     string             `json:"error,omitempty"`
 	Questions []*models.Question `json:"questions"`
 }
