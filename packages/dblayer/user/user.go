@@ -3,37 +3,44 @@ package user
 import (
 	"context"
 	"errors"
+
 	"github.com/acha-bill/quizzer_backend/models"
 	"github.com/acha-bill/quizzer_backend/packages/mongodb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
+
 const (
 	collectionName = "users"
 )
+
 var (
 	ctx = context.TODO()
+	// ErrNoUserDeleted returns a no users detected string
 	ErrNoUserDeleted = errors.New("no users were deleted")
 )
 
-func collection () *mongo.Collection{
+func collection() *mongo.Collection {
 	db, _ := mongodb.Database()
 	return db.Collection(collectionName)
 }
 
+// FindAll get all documents in collection
 func FindAll() (users []*models.User, err error) {
-		// passing bson.D{{}} matches all documents in the collection
-		filter := bson.D{{}}
-		users, err = filterUsers(filter)
-		return
-}
-
-func Find(filter interface{}) (users []*models.User,  err error) {
+	// passing bson.D{{}} matches all documents in the collection
+	filter := bson.D{{}}
 	users, err = filterUsers(filter)
 	return
 }
 
+// Find uses a filter to get documents in collection based on filter
+func Find(filter interface{}) (users []*models.User, err error) {
+	users, err = filterUsers(filter)
+	return
+}
+
+// Create creates a user and returns the created user
 func Create(user models.User) (created *models.User, err error) {
 	res, err := collection().InsertOne(ctx, user)
 	if err != nil {
@@ -44,15 +51,17 @@ func Create(user models.User) (created *models.User, err error) {
 	return
 }
 
-func UpdateById(id string, user models.User) {
+// UpdateByID updates document based on provided ID
+func UpdateByID(id string, user models.User) {
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
-	b,_ := bson.Marshal(&user)
+	b, _ := bson.Marshal(&user)
 	update := bson.D{primitive.E{Key: "$set", Value: b}}
 	updated := &models.User{}
 	_ = collection().FindOneAndUpdate(ctx, filter, update).Decode(updated)
 }
 
-func DeleteById(id string) error {
+// DeleteByID deletes a document based on the provided ID
+func DeleteByID(id string) error {
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
 
 	res, err := collection().DeleteOne(ctx, filter)

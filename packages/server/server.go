@@ -2,29 +2,32 @@ package server
 
 import (
 	"fmt"
-	"github.com/acha-bill/quizzer_backend/common"
-	"github.com/acha-bill/quizzer_backend/plugins"
-	"github.com/acha-bill/quizzer_backend/plugins/auth"
-	"github.com/acha-bill/quizzer_backend/plugins/question"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/acha-bill/quizzer_backend/common"
+	"github.com/acha-bill/quizzer_backend/plugins"
+	"github.com/acha-bill/quizzer_backend/plugins/auth"
+	"github.com/acha-bill/quizzer_backend/plugins/question"
+	"github.com/acha-bill/quizzer_backend/plugins/search"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 var (
-	once sync.Once
-	server *echo.Echo
+	once      sync.Once
+	server    *echo.Echo
 	jwtSecret string
 )
 
 var (
-	Plugins = []plugins.Plugin {
+	Plugins = []plugins.Plugin{
 		auth.Plugin(),
 		question.Plugin(),
+		search.Plugin(),
 	}
 )
 
@@ -51,19 +54,18 @@ func instance() *echo.Echo {
 
 	//enable debugging
 	debuggingEnabled, err := strconv.ParseBool(os.Getenv("DEBUGGING_ENABLED"))
-	if  debuggingEnabled && err == nil {
+	if debuggingEnabled && err == nil {
 		e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 			Format: "method=${method}, uri=${uri}, status=${status}\n",
 		}))
 	}
-
 
 	// Routes
 	for _, plugin := range Plugins {
 		fmt.Println(plugin)
 		for _, handler := range plugin.Handlers() {
 			path := plugin.Name() + handler.Path
-			e.Add(handler.Method, path , handler.Handler,middleware.JWTWithConfig(middleware.JWTConfig{
+			e.Add(handler.Method, path, handler.Handler, middleware.JWTWithConfig(middleware.JWTConfig{
 				Skipper: func(ctx echo.Context) bool {
 					return strings.HasPrefix(ctx.Path(), "/auth")
 				},

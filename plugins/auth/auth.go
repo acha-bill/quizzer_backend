@@ -1,6 +1,11 @@
 package auth
 
 import (
+	"net/http"
+	"os"
+	"sync"
+	"time"
+
 	"github.com/acha-bill/quizzer_backend/common"
 	"github.com/acha-bill/quizzer_backend/models"
 	userService "github.com/acha-bill/quizzer_backend/packages/dblayer/user"
@@ -10,42 +15,45 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"os"
-	"sync"
-	"time"
 )
 
 const (
+	// PluginName defines the name of the plugin
 	PluginName = "auth"
 )
+
 var (
 	plugin *Auth
-	once sync.Once
+	once   sync.Once
 )
 
+// Auth structure
 type Auth struct {
-	name string
+	name     string
 	handlers []*plugins.PluginHandler
 }
 
+// AddHandler Method definition from interface
 func (plugin *Auth) AddHandler(method string, path string, handler func(echo.Context) error) {
 	pluginHandler := &plugins.PluginHandler{
 		Path:    path,
 		Handler: handler,
-		Method: method,
+		Method:  method,
 	}
 	plugin.handlers = append(plugin.handlers, pluginHandler)
 }
 
+// Handlers Method definition from interface
 func (plugin *Auth) Handlers() []*plugins.PluginHandler {
 	return plugin.handlers
 }
 
+// Name defines the name of the plugin
 func (plugin *Auth) Name() string {
 	return plugin.name
 }
 
+// NewPlugin returns the new plugin
 func NewPlugin() *Auth {
 	plugin := &Auth{
 		name: PluginName,
@@ -53,7 +61,8 @@ func NewPlugin() *Auth {
 	return plugin
 }
 
-func Plugin() *Auth{
+// Plugin returns an instance of the plugin
+func Plugin() *Auth {
 	once.Do(func() {
 		plugin = NewPlugin()
 	})
@@ -65,7 +74,6 @@ func init() {
 	auth.AddHandler(http.MethodPost, "/login", login)
 	auth.AddHandler(http.MethodPost, "/register", register)
 }
-
 
 ///// handlers
 // @Summary Login user
@@ -128,6 +136,13 @@ func register(ctx echo.Context) error {
 		})
 	}
 
+	// Basic validation
+	if len(req.Username) <= 0 && len(req.Password) <= 0 {
+		return ctx.JSON(http.StatusBadRequest, RegisterErrorResponse{
+			Error: "Empty values for username and password",
+		})
+	}
+
 	filter := bson.D{primitive.E{Key: "username", Value: req.Username}}
 	users, err := userService.Find(filter)
 	if err != nil {
@@ -158,29 +173,33 @@ func register(ctx echo.Context) error {
 		})
 	}
 
-	return ctx.JSON(http.StatusBadRequest, created)
+	return ctx.JSON(http.StatusOK, created)
 }
 
-
+// LoginRequest represents the Request object for Login
 type LoginRequest struct {
-	Username  string `json:"username"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
+// LoginResponse represents the Response object for Login
 type LoginResponse struct {
 	Error string `json:"error,omitempty"`
 	Token string `json:"token,omitempty"`
 }
 
+// RegisterRequest represents the Request object for Register
 type RegisterRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username   string `json:"username"`
+	Password   string `json:"password"`
 	ProfileURL string `json:"profileURL"`
-	IsAdmin bool `json:"isAdmin"`
+	IsAdmin    bool   `json:"isAdmin"`
 }
 
+// RegisterErrorResponse represents the Error Response object for Register
 type RegisterErrorResponse struct {
 	Error string `json:"error,omitempty"`
 }
-type RegisterResponse models.User
 
+// RegisterResponse represents the Response object for Register
+type RegisterResponse models.User
