@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"sync"
 
 	"github.com/acha-bill/quizzer_backend/common"
@@ -67,7 +66,7 @@ func instance() *echo.Echo {
 			path := plugin.Name() + handler.Path
 			e.Add(handler.Method, path, handler.Handler, middleware.JWTWithConfig(middleware.JWTConfig{
 				Skipper: func(ctx echo.Context) bool {
-					return strings.HasPrefix(ctx.Path(), "/auth")
+					return handler.AuthLevel == plugins.AuthLevelNone
 				},
 				Claims:     &common.JWTCustomClaims{},
 				SigningKey: []byte(jwtSecret),
