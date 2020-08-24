@@ -82,7 +82,7 @@ func init() {
 // @Success 200 {Object} SearchResponse
 func findOpponent(ctx echo.Context) error {
 	// Find user
-	filter := bson.D{primitive.E{Key: "id", Value: ctx.Param("userId")}}
+	filter := bson.D{primitive.E{Key: "_id", Value: ctx.Param("userId")}}
 	users, err := userService.Find(filter)
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, ErrorResponse{

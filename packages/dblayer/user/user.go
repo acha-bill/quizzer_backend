@@ -34,6 +34,22 @@ func FindAll() (users []*models.User, err error) {
 	return
 }
 
+// FindById finds the user by id
+func FindById(id string) *models.User {
+	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	var u models.User
+	_ = collection().FindOne(ctx, filter).Decode(&u)
+	return &u
+}
+
+// FindByUsername finds the user by username
+func FindByUsername(username string) *models.User {
+	filter := bson.D{primitive.E{Key: "username", Value: username}}
+	var u models.User
+	_ = collection().FindOne(ctx, filter).Decode(&u)
+	return &u
+}
+
 // Find uses a filter to get documents in collection based on filter
 func Find(filter interface{}) (users []*models.User, err error) {
 	users, err = filterUsers(filter)

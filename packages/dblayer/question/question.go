@@ -3,6 +3,7 @@ package question
 import (
 	"context"
 	"errors"
+
 	"github.com/acha-bill/quizzer_backend/models"
 	"github.com/acha-bill/quizzer_backend/packages/mongodb"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,12 +14,13 @@ import (
 const (
 	collectionName = "questions"
 )
+
 var (
 	ctx                  = context.TODO()
 	ErrNoQuestionDeleted = errors.New("no questions were deleted")
 )
 
-func collection () *mongo.Collection{
+func collection() *mongo.Collection {
 	db, _ := mongodb.Database()
 	return db.Collection(collectionName)
 }
@@ -30,7 +32,7 @@ func FindAll() (questions []*models.Question, err error) {
 	return
 }
 
-func Find(filter interface{}) (questions []*models.Question,  err error) {
+func Find(filter interface{}) (questions []*models.Question, err error) {
 	questions, err = filterQuestions(filter)
 	return
 }
@@ -47,7 +49,7 @@ func Create(question models.Question) (created *models.Question, err error) {
 
 func UpdateById(id string, question models.Question) {
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
-	b,_ := bson.Marshal(&question)
+	b, _ := bson.Marshal(&question)
 	update := bson.D{primitive.E{Key: "$set", Value: b}}
 	updated := &models.Question{}
 	_ = collection().FindOneAndUpdate(ctx, filter, update).Decode(updated)

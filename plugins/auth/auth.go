@@ -112,6 +112,7 @@ func login(ctx echo.Context) error {
 	claims := &common.JWTCustomClaims{
 		Username: u.Username,
 		IsAdmin:  u.IsAdmin,
+		Id:       u.ID.String(),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
 		},
