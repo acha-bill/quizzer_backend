@@ -22,14 +22,16 @@ var (
 )
 
 const (
-	MessageTypeAuth = "auth"
-	MessageTypePing = "ping"
+	MessageTypeAuth   = "auth"
+	MessageTypePing   = "ping"
+	MessageTypeAnswer = "answer"
 )
 
 func init() {
 	msgTypeMap = make(map[string]interface{})
 	msgTypeMap[MessageTypeAuth] = SocketMessageAuth{}
 	msgTypeMap[MessageTypePing] = nil
+	msgTypeMap[MessageTypeAnswer] = SocketMessageAnswer{}
 }
 
 // WsContext is the context of a socket connection
@@ -49,8 +51,8 @@ type WsManager struct {
 	connections map[*websocket.Conn]*WsConnection
 }
 
-// Manager returns the wsmanager instance
-func Manager() *WsManager {
+// ServerManager returns the wsmanager instance
+func ServerManager() *WsManager {
 	once.Do(func() {
 		manager = &WsManager{
 			connections: make(map[*websocket.Conn]*WsConnection),
@@ -107,7 +109,7 @@ func Listen(ctx echo.Context) error {
 
 	conn.SetCloseHandler(func(code int, text string) error {
 		// no need to close as its already closing
-		Manager().RemoveConnection(conn)
+		ServerManager().RemoveConnection(conn)
 		conn.Close()
 		return nil
 	})
@@ -116,7 +118,7 @@ func Listen(ctx echo.Context) error {
 		Socket:  conn,
 		Context: &WsContext{Ready: false},
 	}
-	Manager().AddConnection(wsConn)
+	ServerManager().AddConnection(wsConn)
 
 	for {
 		// Read
@@ -146,7 +148,7 @@ func handleRead(bytes []byte, conn *websocket.Conn) {
 	}
 
 	// first read must be auth
-	wsConnection := Manager().Get(conn)
+	wsConnection := ServerManager().Get(conn)
 	if !wsConnection.Context.Ready && msg.Type != MessageTypeAuth && msg.Type != MessageTypePing {
 		_ = conn.WriteJSON(SocketResponseError{Error: ErrSocketNotAuthenticated.Error()})
 		return
@@ -159,6 +161,9 @@ func handleRead(bytes []byte, conn *websocket.Conn) {
 	case MessageTypeAuth:
 		authMsg := target.(SocketMessageAuth)
 		handleAuthMessage(wsConnection, authMsg)
+	case MessageTypeAnswer:
+		answerMsg := target.(SocketMessageAnswer)
+		handleAnswerMessage(wsConnection, answerMsg)
 	}
 }
 

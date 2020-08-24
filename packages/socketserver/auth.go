@@ -17,11 +17,11 @@ func handleAuthMessage(wsConnection *WsConnection, msg SocketMessageAuth) {
 		return token, nil
 	})
 	if token == nil || err != nil {
-		Manager().WriteConnection(wsConnection, SocketResponseAuth{Error: "err parsing jwt"})
+		ServerManager().WriteConnection(wsConnection, SocketResponseAuth{Error: "err parsing jwt"})
 		return
 	}
 	if !token.Valid {
-		Manager().WriteConnection(wsConnection, SocketResponseAuth{Error: "Invalid jwt"})
+		ServerManager().WriteConnection(wsConnection, SocketResponseAuth{Error: "Invalid jwt"})
 		return
 	}
 	claims := token.Claims.(common.JWTCustomClaims)
@@ -30,7 +30,7 @@ func handleAuthMessage(wsConnection *WsConnection, msg SocketMessageAuth) {
 	wsConnection.Context.User = user
 	wsConnection.Context.Ready = true
 
-	Manager().WriteConnection(wsConnection, SocketResponseAuth{})
+	ServerManager().WriteConnection(wsConnection, SocketResponseAuth{})
 }
 
 // SocketMessageAuth is the auth message
