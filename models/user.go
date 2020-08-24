@@ -8,11 +8,11 @@ import (
 
 // User represents a user
 type User struct {
-	ID          primitive.ObjectID `bson:"id"`
+	ID          primitive.ObjectID `bson:"_id"`
 	Username    string             `bson:"username"`
 	Password    string             `bson:"password"`
 	CreatedAt   time.Time          `bson:"created_at"`
-	UpdatedAt   time.Time          `bson:"update_at"`
+	UpdatedAt   time.Time          `bson:"updated_at"`
 	ProfileURL  string             `bson:"profileURL"`
 	IsAdmin     bool               `bson:"isAdmin"`
 	IsSearching bool               `bson:"isSearching"`

@@ -2,14 +2,15 @@ package mongodb
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
 	"sync"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
-	once sync.Once
+	once   sync.Once
 	client *mongo.Client
 	dbName string
 )
@@ -49,4 +50,3 @@ func connect() (c *mongo.Client, err error) {
 	}
 	return
 }
-

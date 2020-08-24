@@ -6,8 +6,9 @@ import (
 )
 
 type JWTCustomClaims struct {
-	Username  string `json:"username"`
-	IsAdmin bool   `json:"isAdmin"`
+	Username string `json:"username"`
+	IsAdmin  bool   `json:"isAdmin"`
+	Id       string `json:"_id"`
 	jwt.StandardClaims
 }
 

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -61,7 +60,6 @@ func instance() *echo.Echo {
 
 	// Routes
 	for _, plugin := range Plugins {
-		fmt.Println(plugin)
 		for _, handler := range plugin.Handlers() {
 			path := plugin.Name() + handler.Path
 			e.Add(handler.Method, path, handler.Handler, middleware.JWTWithConfig(middleware.JWTConfig{

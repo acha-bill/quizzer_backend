@@ -100,16 +100,16 @@ paths:
   /auth/login:
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: login
-        in: body
-        name: login
-        required: true
-        schema:
-          $ref: '#/definitions/auth.LoginRequest'
+        - description: login
+          in: body
+          name: login
+          required: true
+          schema:
+            $ref: '#/definitions/auth.LoginRequest'
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -117,20 +117,20 @@ paths:
             $ref: '#/definitions/auth.LoginResponse'
       summary: Login user
       tags:
-      - Auth
+        - Auth
   /auth/register:
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: register
-        in: body
-        name: register
-        required: true
-        schema:
-          $ref: '#/definitions/auth.RegisterRequest'
+        - description: register
+          in: body
+          name: register
+          required: true
+          schema:
+            $ref: '#/definitions/auth.RegisterRequest'
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
@@ -138,13 +138,13 @@ paths:
             $ref: '#/definitions/auth.RegisterResponse'
       summary: register user
       tags:
-      - Auth
+        - Auth
   /question/:
     get:
       consumes:
-      - application/json
+        - application/json
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
@@ -152,19 +152,19 @@ paths:
             $ref: '#/definitions/question.FindQuestionsResponse'
       summary: list all questions
       tags:
-      - Question
+        - Question
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: create
-        in: body
-        name: question
-        required: true
-        schema:
-          $ref: '#/definitions/question.CreateQuestionRequest'
+        - description: create
+          in: body
+          name: question
+          required: true
+          schema:
+            $ref: '#/definitions/question.CreateQuestionRequest'
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
@@ -172,7 +172,7 @@ paths:
             $ref: '#/definitions/question.CreateQuestionResponse'
       summary: create question
       tags:
-      - Question
+        - Question
 securityDefinitions:
   ApiKeyAuth:
     in: header

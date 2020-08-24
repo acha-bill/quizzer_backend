@@ -1,13 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"github.com/acha-bill/quizzer_backend/packages/mongodb"
 	"github.com/acha-bill/quizzer_backend/packages/server"
+	"github.com/acha-bill/quizzer_backend/packages/socketserver"
 	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
 )
-
 
 func init() {
 	err := godotenv.Load()
@@ -15,7 +14,6 @@ func init() {
 		log.Fatal(err.Error())
 		return
 	}
-	fmt.Println("0")
 }
 
 // @title Quizzer API
@@ -40,7 +38,6 @@ func init() {
 // @in header
 // @name Authorization
 func main() {
-fmt.Println("1")
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err.Error())
@@ -51,6 +48,9 @@ fmt.Println("1")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	e := server.Instance()
+	e.Static("/", "./public")
+	e.GET("/ws", socketserver.Listen)
 	e.Logger.Fatal(e.Start(":8081"))
 }
