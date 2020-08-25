@@ -1,7 +1,7 @@
 package socketserver
 
 func handlePingMessage(wsConnection *WsConnection) {
-	Manager().WriteConnection(wsConnection, SocketResponsePing{Ping: "pong"})
+	ServerManager().WriteConnection(wsConnection, SocketResponsePing{Ping: "pong"})
 }
 
 // SocketResponsePing is the ping response
