@@ -18,3 +18,10 @@ func IsAdmin(ctx echo.Context) bool {
 	claims := user.Claims.(JWTCustomClaims)
 	return claims.IsAdmin
 }
+
+// GetUsername returns the username of the user holding this context
+func GetUsername(ctx echo.Context) string {
+	user := ctx.Get("user").(*jwt.Token)
+	claims := user.Claims.(JWTCustomClaims)
+	return claims.Username
+}

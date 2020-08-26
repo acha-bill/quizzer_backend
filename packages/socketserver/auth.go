@@ -17,11 +17,11 @@ func handleAuthMessage(wsConnection *WsConnection, msg SocketMessageAuth) {
 		return token, nil
 	})
 	if token == nil || err != nil {
-		ServerManager().WriteConnection(wsConnection, SocketResponseAuth{Error: "err parsing jwt"})
+		ServerManager().WriteConnection(wsConnection, NewSocketResponseAuth("err parsing jwt"))
 		return
 	}
 	if !token.Valid {
-		ServerManager().WriteConnection(wsConnection, SocketResponseAuth{Error: "Invalid jwt"})
+		ServerManager().WriteConnection(wsConnection, NewSocketResponseAuth("Invalid jwt"))
 		return
 	}
 	claims := token.Claims.(common.JWTCustomClaims)
@@ -30,7 +30,7 @@ func handleAuthMessage(wsConnection *WsConnection, msg SocketMessageAuth) {
 	wsConnection.Context.User = user
 	wsConnection.Context.Ready = true
 
-	ServerManager().WriteConnection(wsConnection, SocketResponseAuth{})
+	ServerManager().WriteConnection(wsConnection, NewSocketResponseAuth(""))
 }
 
 // SocketMessageAuth is the auth message
@@ -38,7 +38,17 @@ type SocketMessageAuth struct {
 	Token string
 }
 
+const authResponseType = "auth"
+
 // SocketResponseAuth is the auth response
 type SocketResponseAuth struct {
+	Type  string `json:"type"`
 	Error string `json:"error,omitempty"`
+}
+
+func NewSocketResponseAuth(err string) SocketResponseAuth {
+	return SocketResponseAuth{
+		Type:  authResponseType,
+		Error: err,
+	}
 }
