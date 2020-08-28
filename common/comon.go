@@ -1,6 +1,9 @@
 package common
 
 import (
+	"os"
+	"strings"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 )
@@ -24,4 +27,9 @@ func GetUsername(ctx echo.Context) string {
 	user := ctx.Get("user").(*jwt.Token)
 	claims := user.Claims.(JWTCustomClaims)
 	return claims.Username
+}
+
+// IsDevelopment returns true if the server is running in dev mode.
+func IsDevelopment() bool {
+	return strings.HasPrefix(os.Getenv("ENV"), "d")
 }
