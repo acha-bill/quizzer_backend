@@ -1,0 +1,12 @@
+.my-auto {
+    margin-top:auto;
+    margin-bottom: auto;
+}
+
+.main-container {
+    background-color: white;
+}
+.login-form {
+    background-color: white;
+    border-radius: 5px;
+}
