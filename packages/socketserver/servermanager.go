@@ -49,6 +49,7 @@ type WsConnection struct {
 // WsManager is the manager of connections
 type WsManager struct {
 	connections map[*websocket.Conn]*WsConnection
+	users       map[string]*websocket.Conn
 }
 
 // ServerManager returns the wsmanager instance
@@ -56,6 +57,7 @@ func ServerManager() *WsManager {
 	once.Do(func() {
 		manager = &WsManager{
 			connections: make(map[*websocket.Conn]*WsConnection),
+			users:       make(map[string]*websocket.Conn),
 		}
 	})
 	return manager
@@ -64,8 +66,15 @@ func ServerManager() *WsManager {
 // AddConnection adds a new socket connection
 func (mgr *WsManager) AddConnection(wsCon *WsConnection) {
 	mutex.Lock()
+	defer mutex.Unlock()
 	mgr.connections[wsCon.Socket] = wsCon
-	mutex.Unlock()
+}
+
+// AddUser adds a user to the conn
+func (mgr *WsManager) AddUser(username string, conn *websocket.Conn) {
+	mutex.Lock()
+	defer mutex.Unlock()
+	mgr.users[username] = conn
 }
 
 // RemoveConnection closes and removes the connection from the manager
@@ -88,15 +97,23 @@ func (mgr *WsManager) Length() int {
 	return l
 }
 
-// Get gets the specified connection
+// Get gets the WsConnection with the specified conn
 func (mgr *WsManager) Get(conn *websocket.Conn) *WsConnection {
 	return mgr.connections[conn]
+}
+
+// GetByUsername gets the WsConnection bound to the username specified
+func (mgr *WsManager) GetByUsername(username string) *WsConnection {
+	if conn, ok := mgr.users[username]; ok {
+		return mgr.connections[conn]
+	}
+	return nil
 }
 
 // WriteConnection writes the JSON serialized form of the data to the connection
 func (mgr *WsManager) WriteConnection(conn *WsConnection, data interface{}) {
 	if err := conn.Socket.WriteJSON(data); err != nil {
-		log.Errorf("%w", ErrWritingToConnection)
+		log.Errorf("%v", ErrWritingToConnection)
 	}
 }
 
@@ -108,7 +125,8 @@ func Listen(ctx echo.Context) error {
 	}
 
 	conn.SetCloseHandler(func(code int, text string) error {
-		// no need to close as its already closing
+		// TODO: Remove from searching
+		// TODO: Remove from active games
 		ServerManager().RemoveConnection(conn)
 		conn.Close()
 		return nil
@@ -116,7 +134,7 @@ func Listen(ctx echo.Context) error {
 
 	wsConn := &WsConnection{
 		Socket:  conn,
-		Context: &WsContext{Ready: false},
+		Context: &WsContext{Ready: false, User: nil},
 	}
 	ServerManager().AddConnection(wsConn)
 

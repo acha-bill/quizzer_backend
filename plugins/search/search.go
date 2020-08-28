@@ -1,15 +1,15 @@
 package search
 
 import (
+	"errors"
 	"net/http"
 	"sync"
 
-	"github.com/acha-bill/quizzer_backend/models"
-	userService "github.com/acha-bill/quizzer_backend/packages/dblayer/user"
+	"github.com/acha-bill/quizzer_backend/common"
+	"github.com/acha-bill/quizzer_backend/packages/socketserver"
+
 	"github.com/acha-bill/quizzer_backend/plugins"
 	"github.com/labstack/echo/v4"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
@@ -18,8 +18,14 @@ const (
 )
 
 var (
-	plugin *Search
-	once   sync.Once
+	plugin              *Search
+	once                sync.Once
+	ErrUserNotConnected = errors.New("user not connected")
+)
+
+const (
+	// GameLength defines the number of questions in a game
+	GameLength = 10
 )
 
 // Search structure
@@ -70,55 +76,45 @@ func Plugin() *Search {
 
 func init() {
 	search := Plugin()
-	search.AddHandler(http.MethodGet, "/:userId", findOpponent)
+	search.AddHandler(http.MethodGet, "/search", findOpponent)
 }
 
-// @Summary search for opponent for user with id=userId
-// @Accept ID
+// @Summary search for a random opponent
+// @Accept json
 // @produce json
-// @Router /search/:userId [get]
+// @Router /search [get]
 // @Tags Search
-// @Param search userId
-// @Success 200 {Object} SearchResponse
+// @Success 200 {Object} SocketResponseSearch
 func findOpponent(ctx echo.Context) error {
-	// Find user
-	filter := bson.D{primitive.E{Key: "_id", Value: ctx.Param("userId")}}
-	users, err := userService.Find(filter)
+	gameMgr := socketserver.GameManager()
+	serverMgr := socketserver.ServerManager()
+	username := common.GetUsername(ctx)
+	wsConn := serverMgr.GetByUsername(username)
+	if wsConn == nil {
+		return ctx.JSON(http.StatusNotFound, SearchOpponentResponse{
+			Error: ErrUserNotConnected.Error(),
+		})
+	}
+	err := gameMgr.AddSearcher(wsConn)
 	if err != nil {
-		return ctx.JSON(http.StatusNotFound, ErrorResponse{
+		return ctx.JSON(http.StatusBadRequest, SearchOpponentResponse{
 			Error: err.Error(),
 		})
 	}
 
-	if len(users) == 0 {
-		return ctx.JSON(http.StatusNotFound, ErrorResponse{
-			Error: "User doesn't exist!",
-		})
+	player1, player2 := gameMgr.GetPair()
+	if player1 != nil && player2 != nil {
+		if err := gameMgr.NewGame(player1, player2, GameLength); err != nil {
+			return ctx.JSON(http.StatusBadRequest, SearchOpponentResponse{
+				Error: err.Error(),
+			})
+		}
 	}
 
-	// Put user in search mode
-	users[0].IsSearching = true
-	userService.UpdateByID(ctx.Param("userId"), *(users[0]))
-	// Get other users in search mode
-	filter = bson.D{primitive.E{Key: "isSearching", Value: true}}
-	users, err = userService.Find(filter)
-	if err != nil {
-		return ctx.JSON(http.StatusServiceUnavailable, ErrorResponse{
-			Error: err.Error(),
-		})
-	}
-	// Pair user with first in search mode
-	if len(users) > 0 {
-		return ctx.JSON(http.StatusOK, users[0])
-	}
-	// Or return emtpy list for no opponents found
-	return ctx.JSON(http.StatusOK, users)
+	return ctx.JSON(http.StatusOK, SearchOpponentResponse{})
 }
 
-// ErrorResponse represents the Search Response for Errors
-type ErrorResponse struct {
+// SearchOpponentResponse represents the Search Response
+type SearchOpponentResponse struct {
 	Error string `json:"error,omitempty"`
 }
-
-// SearchResponse represents the Response object for Search
-type SearchResponse models.User

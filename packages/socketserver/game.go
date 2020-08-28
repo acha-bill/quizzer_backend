@@ -99,13 +99,7 @@ func nextRound(game *Game) {
 	timeSent := time.Now()
 	//send question to players
 	for _, player := range game.Players {
-		ServerManager().WriteConnection(player, SocketResponseQuestion{
-			Time:          timeSent.Unix(),
-			Round:         round,
-			Question:      game.Questions[round].Question,
-			Answers:       game.Questions[round].Answers,
-			CorrectAnswer: game.Questions[round].CorrectAnswer,
-		})
+		ServerManager().WriteConnection(player, NewSocketResponseQuestion(timeSent.Unix(), round, game.Questions[round].Question, game.Questions[round].Answers, game.Questions[round].CorrectAnswer))
 	}
 	game.RoundTimes[round] = timeSent
 
@@ -125,13 +119,28 @@ func handleAnswerMessage(wsConnection *WsConnection, answer SocketMessageAnswer)
 	g.SetRoundResult(wsConnection, answer.Round, answer.Answer, time.Now())
 }
 
+const responseQuestionType = "question"
+
 // SocketResponseQuestion represents a question
 type SocketResponseQuestion struct {
+	Type          string   `json:"type"`
 	Time          int64    `json:"time"`
 	Round         int      `json:"round"`
 	Question      string   `json:"question"`
 	Answers       []string `json:"answers"`
 	CorrectAnswer string   `json:"correctAnswer"`
+}
+
+// NewSocketResponseQuestion returns a new NewSocketResponseQuestion
+func NewSocketResponseQuestion(time int64, round int, question string, answers []string, correctAnswer string) SocketResponseQuestion {
+	return SocketResponseQuestion{
+		Type:          responseQuestionType,
+		Time:          time,
+		Round:         round,
+		Question:      question,
+		Answers:       answers,
+		CorrectAnswer: correctAnswer,
+	}
 }
 
 // SocketMessageAnswer represents the answer to a specific round of the questions.
