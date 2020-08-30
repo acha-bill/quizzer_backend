@@ -25,6 +25,7 @@ const (
 	MessageTypeAuth   = "auth"
 	MessageTypePing   = "ping"
 	MessageTypeAnswer = "answer"
+	MessageTypeQuit   = "quit"
 )
 
 func init() {
@@ -32,6 +33,7 @@ func init() {
 	msgTypeMap[MessageTypeAuth] = SocketMessageAuth{}
 	msgTypeMap[MessageTypePing] = nil
 	msgTypeMap[MessageTypeAnswer] = SocketMessageAnswer{}
+	msgTypeMap[MessageTypeQuit] = SocketMessageQuit{}
 }
 
 // WsContext is the context of a socket connection
@@ -125,8 +127,12 @@ func Listen(ctx echo.Context) error {
 	}
 
 	conn.SetCloseHandler(func(code int, text string) error {
-		// TODO: Remove from searching
-		// TODO: Remove from active games
+		player := ServerManager().connections[conn]
+		GameManager().RemoveSearcher(player)
+		game := GameManager().FindPlayerGame(player)
+		if game != nil {
+			game.PrematureLoose(player)
+		}
 		ServerManager().RemoveConnection(conn)
 		conn.Close()
 		return nil
@@ -182,6 +188,9 @@ func handleRead(bytes []byte, conn *websocket.Conn) {
 	case MessageTypeAnswer:
 		answerMsg := target.(SocketMessageAnswer)
 		handleAnswerMessage(wsConnection, answerMsg)
+	case MessageTypeQuit:
+		quitMsg := target.(SocketMessageQuit)
+		handleQuitMessage(wsConnection, quitMsg)
 	}
 }
 
