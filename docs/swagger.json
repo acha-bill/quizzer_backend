@@ -1,281 +1,470 @@
 {
-  "swagger": "2.0",
-  "info": {
-    "description": "API for quizzer",
-    "title": "Quizzer API",
-    "termsOfService": "http://swagger.io/terms/",
-    "contact": {
-      "name": "Acha Bill",
-      "url": "http://www.swagger.io/support",
-      "email": "support@swagger.io"
+    "swagger": "2.0",
+    "info": {
+        "description": "API for quizzer",
+        "title": "Quizzer API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Acha Bill",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
     },
-    "license": {
-      "name": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-    },
-    "version": "1.0"
-  },
-  "host": "localhost:8080",
-  "basePath": "/api/v1",
-  "paths": {
-    "/auth/login": {
-      "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Login user",
-        "parameters": [
-          {
-            "description": "login",
-            "name": "login",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/auth.LoginRequest"
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login user",
+                "parameters": [
+                    {
+                        "description": "login",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginResponse"
+                        }
+                    }
+                }
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/auth.LoginResponse"
+        },
+        "/auth/register": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "register user",
+                "parameters": [
+                    {
+                        "description": "register",
+                        "name": "register",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.RegisterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/auth.RegisterResponse"
+                        }
+                    }
+                }
             }
-          }
-        }
-      }
-    },
-    "/auth/register": {
-      "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "Auth"
-        ],
-        "summary": "register user",
-        "parameters": [
-          {
-            "description": "register",
-            "name": "register",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/auth.RegisterRequest"
+        },
+        "/category/": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "list all categories",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/category.FindCategoryResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "create category",
+                "parameters": [
+                    {
+                        "description": "create",
+                        "name": "question",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/category.CreateCategoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/category.CreateCategoryResponse"
+                        }
+                    }
+                }
             }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "$ref": "#/definitions/auth.RegisterResponse"
+        },
+        "/category/:id": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "edit category",
+                "parameters": [
+                    {
+                        "description": "create",
+                        "name": "question",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/category.EditCategoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/category.EditCategoryResponse"
+                        }
+                    }
+                }
             }
-          }
-        }
-      }
-    },
-    "/question/": {
-      "get": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "Question"
-        ],
-        "summary": "list all questions",
-        "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "$ref": "#/definitions/question.FindQuestionsResponse"
+        },
+        "/question/": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Question"
+                ],
+                "summary": "list all questions",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/question.FindQuestionsResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Question"
+                ],
+                "summary": "create question",
+                "parameters": [
+                    {
+                        "description": "create",
+                        "name": "question",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/question.CreateQuestionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/question.CreateQuestionResponse"
+                        }
+                    }
+                }
             }
-          }
-        }
-      },
-      "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "Question"
-        ],
-        "summary": "create question",
-        "parameters": [
-          {
-            "description": "create",
-            "name": "question",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/question.CreateQuestionRequest"
+        },
+        "/search": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Search"
+                ],
+                "summary": "search for a random opponent",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "Object"
+                        }
+                    }
+                }
             }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "$ref": "#/definitions/question.CreateQuestionResponse"
+        }
+    },
+    "definitions": {
+        "auth.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
             }
-          }
-        }
-      }
-    }
-  },
-  "definitions": {
-    "auth.LoginRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
         },
-        "username": {
-          "type": "string"
-        }
-      }
-    },
-    "auth.LoginResponse": {
-      "type": "object",
-      "properties": {
-        "error": {
-          "type": "string"
+        "auth.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
         },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "auth.RegisterRequest": {
-      "type": "object",
-      "properties": {
-        "isAdmin": {
-          "type": "boolean"
+        "auth.RegisterRequest": {
+            "type": "object",
+            "properties": {
+                "isAdmin": {
+                    "type": "boolean"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "profileURL": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
         },
-        "password": {
-          "type": "string"
+        "auth.RegisterResponse": {
+            "$ref": "#/definitions/models.User"
         },
-        "profileURL": {
-          "type": "string"
+        "category.CreateCategoryRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
         },
-        "username": {
-          "type": "string"
-        }
-      }
-    },
-    "auth.RegisterResponse": {
-      "$ref": "#/definitions/models.User"
-    },
-    "models.Question": {
-      "type": "object",
-      "properties": {
-        "answers": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "category.CreateCategoryResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Category"
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
         },
-        "correctAnswer": {
-          "type": "string"
+        "category.EditCategoryRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
         },
-        "createdAt": {
-          "type": "string"
+        "category.EditCategoryResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Category"
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
         },
-        "id": {
-          "type": "string"
+        "category.FindCategoryResponse": {
+            "type": "object",
+            "properties": {
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Category"
+                    }
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
         },
-        "question": {
-          "type": "string"
+        "models.Category": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
         },
-        "updatedAt": {
-          "type": "string"
-        }
-      }
-    },
-    "models.User": {
-      "type": "object",
-      "properties": {
-        "createdAt": {
-          "type": "string"
+        "models.Question": {
+            "type": "object",
+            "properties": {
+                "answers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "category": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Category"
+                },
+                "correctAnswer": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "question": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
         },
-        "id": {
-          "type": "string"
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isAdmin": {
+                    "type": "boolean"
+                },
+                "isSearching": {
+                    "type": "boolean"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "profileURL": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
         },
-        "isAdmin": {
-          "type": "boolean"
+        "question.CreateQuestionRequest": {
+            "type": "object",
+            "properties": {
+                "answers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "correctAnswer": {
+                    "type": "string"
+                },
+                "question": {
+                    "type": "string"
+                }
+            }
         },
-        "password": {
-          "type": "string"
-        },
-        "profileURL": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
-        }
-      }
-    },
-    "question.CreateQuestionRequest": {
-      "type": "object",
-      "properties": {
-        "answers": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "correctAnswer": {
-          "type": "string"
-        },
-        "question": {
-          "type": "string"
-        }
-      }
-    },
-    "question.CreateQuestionResponse": {
-      "$ref": "#/definitions/models.Question"
-    },
-    "question.FindQuestionsResponse": {
-      "type": "object",
-      "properties": {
-        "error": {
-          "type": "string"
-        },
-        "questions": {
-          "type": "array",
-          "items": {
+        "question.CreateQuestionResponse": {
             "$ref": "#/definitions/models.Question"
-          }
+        },
+        "question.FindQuestionsResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Question"
+                    }
+                }
+            }
         }
-      }
-    }
-  },
-  "securityDefinitions": {
-    "ApiKeyAuth": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
     },
-    "BasicAuth": {
-      "type": "basic"
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        },
+        "BasicAuth": {
+            "type": "basic"
+        }
     }
-  }
 }

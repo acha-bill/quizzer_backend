@@ -27,12 +27,63 @@ definitions:
     type: object
   auth.RegisterResponse:
     $ref: '#/definitions/models.User'
+  category.CreateCategoryRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  category.CreateCategoryResponse:
+    properties:
+      category:
+        $ref: '#/definitions/models.Category'
+        type: object
+      error:
+        type: string
+    type: object
+  category.EditCategoryRequest:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  category.EditCategoryResponse:
+    properties:
+      category:
+        $ref: '#/definitions/models.Category'
+        type: object
+      error:
+        type: string
+    type: object
+  category.FindCategoryResponse:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/models.Category'
+        type: array
+      error:
+        type: string
+    type: object
+  models.Category:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   models.Question:
     properties:
       answers:
         items:
           type: string
         type: array
+      category:
+        $ref: '#/definitions/models.Category'
+        type: object
       correctAnswer:
         type: string
       createdAt:
@@ -51,6 +102,8 @@ definitions:
       id:
         type: string
       isAdmin:
+        type: boolean
+      isSearching:
         type: boolean
       password:
         type: string
@@ -100,16 +153,16 @@ paths:
   /auth/login:
     post:
       consumes:
-        - application/json
+      - application/json
       parameters:
-        - description: login
-          in: body
-          name: login
-          required: true
-          schema:
-            $ref: '#/definitions/auth.LoginRequest'
+      - description: login
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
@@ -117,20 +170,20 @@ paths:
             $ref: '#/definitions/auth.LoginResponse'
       summary: Login user
       tags:
-        - Auth
+      - Auth
   /auth/register:
     post:
       consumes:
-        - application/json
+      - application/json
       parameters:
-        - description: register
-          in: body
-          name: register
-          required: true
-          schema:
-            $ref: '#/definitions/auth.RegisterRequest'
+      - description: register
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
@@ -138,13 +191,68 @@ paths:
             $ref: '#/definitions/auth.RegisterResponse'
       summary: register user
       tags:
-        - Auth
+      - Auth
+  /category/:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/category.FindCategoryResponse'
+      summary: list all categories
+      tags:
+      - Category
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: create
+        in: body
+        name: question
+        required: true
+        schema:
+          $ref: '#/definitions/category.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/category.CreateCategoryResponse'
+      summary: create category
+      tags:
+      - Category
+  /category/:id:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: create
+        in: body
+        name: question
+        required: true
+        schema:
+          $ref: '#/definitions/category.EditCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/category.EditCategoryResponse'
+      summary: edit category
+      tags:
+      - Category
   /question/:
     get:
       consumes:
-        - application/json
+      - application/json
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
@@ -152,19 +260,19 @@ paths:
             $ref: '#/definitions/question.FindQuestionsResponse'
       summary: list all questions
       tags:
-        - Question
+      - Question
     post:
       consumes:
-        - application/json
+      - application/json
       parameters:
-        - description: create
-          in: body
-          name: question
-          required: true
-          schema:
-            $ref: '#/definitions/question.CreateQuestionRequest'
+      - description: create
+        in: body
+        name: question
+        required: true
+        schema:
+          $ref: '#/definitions/question.CreateQuestionRequest'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
@@ -172,7 +280,21 @@ paths:
             $ref: '#/definitions/question.CreateQuestionResponse'
       summary: create question
       tags:
-        - Question
+      - Question
+  /search:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: Object
+      summary: search for a random opponent
+      tags:
+      - Search
 securityDefinitions:
   ApiKeyAuth:
     in: header

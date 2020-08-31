@@ -99,6 +99,92 @@ var doc = `{
                 }
             }
         },
+        "/category/": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "list all categories",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/category.FindCategoryResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "create category",
+                "parameters": [
+                    {
+                        "description": "create",
+                        "name": "question",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/category.CreateCategoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/category.CreateCategoryResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/category/:id": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "edit category",
+                "parameters": [
+                    {
+                        "description": "create",
+                        "name": "question",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/category.EditCategoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/category.EditCategoryResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/question/": {
             "get": {
                 "consumes": [
@@ -151,6 +237,28 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/search": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Search"
+                ],
+                "summary": "search for a random opponent",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "Object"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -196,6 +304,80 @@ var doc = `{
         "auth.RegisterResponse": {
             "$ref": "#/definitions/models.User"
         },
+        "category.CreateCategoryRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "category.CreateCategoryResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Category"
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "category.EditCategoryRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "category.EditCategoryResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Category"
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "category.FindCategoryResponse": {
+            "type": "object",
+            "properties": {
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Category"
+                    }
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Category": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Question": {
             "type": "object",
             "properties": {
@@ -204,6 +386,10 @@ var doc = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "category": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Category"
                 },
                 "correctAnswer": {
                     "type": "string"
@@ -232,6 +418,9 @@ var doc = `{
                     "type": "string"
                 },
                 "isAdmin": {
+                    "type": "boolean"
+                },
+                "isSearching": {
                     "type": "boolean"
                 },
                 "password": {

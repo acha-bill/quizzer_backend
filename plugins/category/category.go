@@ -66,7 +66,7 @@ func init() {
 	category := Plugin()
 	category.AddHandler(http.MethodPost, "/", create)
 	category.AddHandler(http.MethodGet, "/", find)
-	category.AddHandler(http.MethodPost, "/:id", edit)
+	category.AddHandler(http.MethodPut, "/:id", edit)
 	// TODO: implement
 	//category.AddHandler(http.MethodGet, "/:id", remove)
 }
