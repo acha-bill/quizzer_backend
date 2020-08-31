@@ -134,7 +134,7 @@ func create(ctx echo.Context) error {
 // @Summary edit category
 // @Accept  json
 // @Produce  json
-// @Router /category/:id [post]
+// @Router /category/:id [put]
 // @Tags Category
 // @Param question body EditCategoryRequest true "create"
 // @Success 201 {object} EditCategoryResponse

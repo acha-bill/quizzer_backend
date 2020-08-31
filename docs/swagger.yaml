@@ -227,7 +227,7 @@ paths:
       tags:
       - Category
   /category/:id:
-    post:
+    put:
       consumes:
       - application/json
       parameters:

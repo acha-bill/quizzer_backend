@@ -153,7 +153,7 @@ var doc = `{
             }
         },
         "/category/:id": {
-            "post": {
+            "put": {
                 "consumes": [
                     "application/json"
                 ],

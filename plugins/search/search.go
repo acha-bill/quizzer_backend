@@ -84,7 +84,7 @@ func init() {
 // @produce json
 // @Router /search [get]
 // @Tags Search
-// @Success 200 {Object} SocketResponseSearch
+// @Success 200 {object} SearchOpponentResponse
 func findOpponent(ctx echo.Context) error {
 	gameMgr := socketserver.GameManager()
 	serverMgr := socketserver.ServerManager()
