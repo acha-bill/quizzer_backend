@@ -14,4 +14,5 @@ type Question struct {
 	CorrectAnswer string             `bson:"correctAnswer"`
 	CreatedAt     time.Time          `bson:"created_at"`
 	UpdatedAt     time.Time          `bson:"updated_at"`
+	Category      Category           `bson:"category"`
 }

@@ -66,6 +66,10 @@ func init() {
 	auth := Plugin()
 	auth.AddHandler(http.MethodPost, "/", create)
 	auth.AddHandler(http.MethodGet, "/", find)
+	// TODO: add these
+	//auth.AddHandler(http.MethodPut, "/:id", edit)
+	//auth.AddHandler(http.MethodDelete, "/:id", find)
+
 }
 
 // @Summary list all questions

@@ -118,6 +118,24 @@ func (mgr *GManager) AddSearcher(player *WsConnection) error {
 	return nil
 }
 
+// RemoveSearcher removes the searcher from the searcing array and preservers the order.
+func (mgr *GManager) RemoveSearcher(player *WsConnection) {
+	searchingMutex.Lock()
+	defer searchingMutex.Unlock()
+	pos := -1
+	for i, v := range mgr.searching {
+		if v == player {
+			pos = i
+			break
+		}
+	}
+	if pos < 0 {
+		return
+	}
+	temp := mgr.searching[:pos]
+	mgr.searching = append(temp, mgr.searching[pos+1:]...)
+}
+
 // GetPair returns the 1st two players in the searching queue.
 // It nil for both if the pair cannot be formed.
 func (mgr *GManager) GetPair() (player1 *WsConnection, player2 *WsConnection) {
